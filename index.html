@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UPSC Photo & Signature Prep</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="halo halo-a" aria-hidden="true"></div>
+  <div class="halo halo-b" aria-hidden="true"></div>
+  <main class="app">
+    <header class="app-header">
+      <h1>UPSC Photo & Signature Preparation</h1>
+      <p>Prepare UPSC-compliant photo and triple-signature images. Export as fixed JPG filenames.</p>
+    </header>
+
+    <nav class="mode-switch" aria-label="Preparation mode">
+      <button id="modePhotoBtn" class="mode-btn active" type="button">Prepare Photo</button>
+      <button id="modeSignatureBtn" class="mode-btn" type="button">Prepare Signature</button>
+    </nav>
+
+    <section id="photoMode" class="mode-panel">
+      <div id="statusBanner" class="status info" role="status" aria-live="polite">
+        Start with Step 1 to capture or upload your photo.
+      </div>
+
+      <section class="card" id="step1">
+        <h2>1. Capture or Upload</h2>
+        <p class="helper">Use a front-facing, well-lit photo. Keep face straight and centered.</p>
+        <div class="button-row">
+          <button id="startCameraBtn" class="primary" type="button">Open Camera</button>
+          <label class="file-btn capture-btn" for="captureInput">
+            Take Photo (Phone)
+            <input id="captureInput" type="file" accept="image/*" capture="user">
+          </label>
+          <label class="file-btn" for="uploadInput">
+            Upload Image
+            <input id="uploadInput" type="file" accept="image/*">
+          </label>
+        </div>
+        <div id="cameraPane" class="camera-pane" hidden>
+          <div class="camera-shell">
+            <video id="cameraVideo" playsinline autoplay muted></video>
+            <div class="camera-overlay" aria-hidden="true"></div>
+          </div>
+          <div class="button-row">
+            <button id="captureBtn" type="button">Capture Photo</button>
+            <button id="stopCameraBtn" type="button" class="secondary">Close Camera</button>
+          </div>
+        </div>
+        <p id="sourceMeta" class="meta">No source selected yet.</p>
+      </section>
+
+      <section class="card disabled" id="step2">
+        <h2>2. Adjust Framing (3/4 Face Coverage Guide)</h2>
+        <p class="helper">Adjust zoom and position so the head fills most of the frame and stays centered.</p>
+        <div class="canvas-wrap">
+          <canvas id="adjustCanvas"></canvas>
+          <canvas id="guideCanvas" aria-hidden="true"></canvas>
+        </div>
+        <p class="guide-note">Green guide indicates ideal UPSC framing. Side ticks indicate ear visibility zone.</p>
+        <div class="controls">
+          <label for="zoomRange">
+            Zoom
+            <input id="zoomRange" type="range" min="80" max="200" value="100">
+          </label>
+          <label for="offsetXRange">
+            Move Left / Right
+            <input id="offsetXRange" type="range" min="-260" max="260" value="0">
+          </label>
+          <label for="offsetYRange">
+            Move Up / Down
+            <input id="offsetYRange" type="range" min="-260" max="260" value="0">
+          </label>
+        </div>
+        <div class="button-row">
+          <button id="retakeBtn" type="button" class="secondary">Retake photo</button>
+          <button id="usePhotoBtn" type="button" class="primary">Use this photo</button>
+        </div>
+      </section>
+
+      <section class="card disabled" id="step3">
+        <h2>3. Name, Date, and Compliance Checks</h2>
+        <p class="helper">Fill these fields exactly as needed. Run checks before final export.</p>
+        <div class="grid two">
+          <label for="candidateName">
+            Candidate Name
+            <input id="candidateName" type="text" placeholder="Enter full name">
+          </label>
+          <label for="photoDate">
+            Date
+            <input id="photoDate" type="date">
+          </label>
+        </div>
+
+        <div class="grid two">
+          <label for="applicationStartDate">
+            Application Start Date
+            <input id="applicationStartDate" type="date">
+          </label>
+          <label for="captureDate">
+            Capture Date (Optional)
+            <input id="captureDate" type="date">
+          </label>
+        </div>
+        <p id="recencyStatus" class="pill neutral">Recency status pending.</p>
+
+        <h3>Required Manual Confirmations</h3>
+        <div class="check-grid">
+          <label class="check-item"><input id="confirmFrontal" type="checkbox"> Face is directly frontal (no tilt/side profile).</label>
+          <label class="check-item"><input id="confirmEyesOpen" type="checkbox"> Eyes are open and clearly visible.</label>
+          <label class="check-item"><input id="confirmEarsVisible" type="checkbox"> Both ears are clearly visible.</label>
+          <label class="check-item"><input id="confirmNaturalExpression" type="checkbox"> Expression is natural (no grinning/frowning/raised eyebrows).</label>
+          <label class="check-item"><input id="confirmHairClear" type="checkbox"> Hair is not covering the eyes.</label>
+          <label class="check-item"><input id="confirmGlassesNoGlare" type="checkbox"> If glasses are worn, no glare is visible.</label>
+        </div>
+
+        <h3>Do-not-upload Validation Flags</h3>
+        <div class="check-grid warning-grid">
+          <label class="check-item warn"><input id="flagUniformHeadwear" type="checkbox"> Uniform, sunglasses, or headwear present (except religious reason with full visible face).</label>
+          <label class="check-item warn"><input id="flagSignedPhoto" type="checkbox"> Signed photo detected.</label>
+        </div>
+
+        <label for="qualityRange">
+          Quality Preference (auto-adjust still enforces 20KB to 200KB)
+          <div class="quality-row">
+            <input id="qualityRange" type="range" min="40" max="100" value="88">
+            <span id="qualityValue">88%</span>
+          </div>
+        </label>
+
+        <label class="check-item compliance-mode">
+          <input id="complianceMode" type="checkbox">
+          I reviewed the UPSC compliance checklist before export.
+        </label>
+
+        <div class="button-row">
+          <button id="runChecksBtn" type="button">Run compliance checks</button>
+        </div>
+
+        <ul id="warningsList" class="warnings"></ul>
+      </section>
+
+      <section class="card disabled" id="step4">
+        <h2>4. Generate and Export</h2>
+        <p class="helper">Preview final output and download with fixed filename <strong>photo.jpg</strong>.</p>
+        <div class="button-row">
+          <button id="generateBtn" type="button" class="primary">Generate final JPG</button>
+          <button id="downloadBtn" type="button" disabled>Download photo.jpg</button>
+        </div>
+
+        <div class="final-grid">
+          <img id="finalPreview" alt="Final photo preview">
+          <div>
+            <ul class="details" id="finalDetails">
+              <li><span>File name</span><strong>photo.jpg</strong></li>
+              <li><span>File size</span><strong id="detailSize">-</strong></li>
+              <li><span>Dimensions</span><strong id="detailDimensions">-</strong></li>
+              <li><span>Format</span><strong id="detailFormat">JPG/JPEG</strong></li>
+              <li><span>Compliance</span><strong id="detailCompliance">Pending</strong></li>
+            </ul>
+            <ul id="checklist" class="checklist"></ul>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <section id="signatureMode" class="mode-panel" hidden>
+      <div id="signatureStatusBanner" class="status info" role="status" aria-live="polite">
+        Signature mode is ready. Capture or upload your triple-signature image.
+      </div>
+
+      <section class="card" id="sigIntro">
+        <h2>Signature Rules (UPSC Triple Signature)</h2>
+        <ul class="instruction-list">
+          <li>Sign on plain white paper using black ink.</li>
+          <li>Sign exactly 3 times, same signature, one below the other.</li>
+          <li>Keep signatures vertically aligned with spacing between each signature.</li>
+          <li>Capture all three signatures clearly in one image with proper lighting.</li>
+          <li>Final output must be JPG/JPEG, 20KB to 100KB, with dimensions 350px to 500px.</li>
+        </ul>
+      </section>
+
+      <section class="card" id="sigStep1">
+        <h2>1. Capture or Upload Signature</h2>
+        <div class="button-row">
+          <button id="sigStartCameraBtn" class="primary" type="button">Capture Signature</button>
+          <label class="file-btn capture-btn" for="sigCaptureInput">
+            Take Signature (Phone)
+            <input id="sigCaptureInput" type="file" accept="image/*" capture="environment">
+          </label>
+          <label class="file-btn" for="sigUploadInput">
+            Upload Signature
+            <input id="sigUploadInput" type="file" accept="image/*">
+          </label>
+        </div>
+        <div id="sigCameraPane" class="camera-pane" hidden>
+          <div class="camera-shell signature-shell">
+            <video id="sigCameraVideo" playsinline autoplay muted></video>
+            <div class="camera-overlay signature-overlay" aria-hidden="true"></div>
+          </div>
+          <div class="button-row">
+            <button id="sigCaptureBtn" type="button">Capture Signature</button>
+            <button id="sigStopCameraBtn" type="button" class="secondary">Close Camera</button>
+          </div>
+        </div>
+        <p id="sigSourceMeta" class="meta">No signature source selected yet.</p>
+      </section>
+
+      <section class="card disabled" id="sigStep2">
+        <h2>2. Crop and Adjust</h2>
+        <p class="helper">Include all 3 signatures clearly. Keep them vertically aligned with spacing.</p>
+        <div class="canvas-wrap signature-wrap">
+          <canvas id="sigAdjustCanvas"></canvas>
+          <canvas id="sigGuideCanvas" aria-hidden="true"></canvas>
+        </div>
+        <p class="guide-note">Blue slots guide where each signature should appear.</p>
+        <div class="controls">
+          <label for="sigZoomRange">
+            Zoom
+            <input id="sigZoomRange" type="range" min="80" max="220" value="100">
+          </label>
+          <label for="sigOffsetXRange">
+            Move Left / Right
+            <input id="sigOffsetXRange" type="range" min="-220" max="220" value="0">
+          </label>
+          <label for="sigOffsetYRange">
+            Move Up / Down
+            <input id="sigOffsetYRange" type="range" min="-220" max="220" value="0">
+          </label>
+        </div>
+        <div class="button-row">
+          <button id="sigRotateBtn" type="button">Rotate</button>
+          <button id="sigCropBtn" type="button" class="primary">Crop</button>
+          <button id="sigRetakeBtn" type="button" class="secondary">Retake</button>
+        </div>
+      </section>
+
+      <section class="card disabled" id="sigStep3">
+        <h2>3. Validate and Export</h2>
+        <p class="helper">Run checks, then generate and download <strong>signature.jpg</strong>.</p>
+        <label for="sigQualityRange">
+          Quality Preference (auto-adjust still enforces 20KB to 100KB)
+          <div class="quality-row">
+            <input id="sigQualityRange" type="range" min="40" max="100" value="88">
+            <span id="sigQualityValue">88%</span>
+          </div>
+        </label>
+        <div class="button-row">
+          <button id="sigRunChecksBtn" type="button">Run Signature Checks</button>
+          <button id="sigGenerateBtn" type="button" class="primary">Generate Signature JPG</button>
+          <button id="sigDownloadBtn" type="button" disabled>Download signature.jpg</button>
+        </div>
+        <ul id="sigWarningsList" class="warnings"></ul>
+
+        <div class="final-grid">
+          <img id="sigFinalPreview" alt="Final signature preview">
+          <div>
+            <ul class="details" id="sigFinalDetails">
+              <li><span>File name</span><strong>signature.jpg</strong></li>
+              <li><span>File size</span><strong id="sigDetailSize">-</strong></li>
+              <li><span>Dimensions</span><strong id="sigDetailDimensions">-</strong></li>
+              <li><span>Format</span><strong id="sigDetailFormat">JPG/JPEG</strong></li>
+              <li><span>3 signatures present</span><strong id="sigDetailTriplet">Pending</strong></li>
+              <li><span>Compliance</span><strong id="sigDetailCompliance">Pending</strong></li>
+            </ul>
+            <ul id="sigChecklist" class="checklist"></ul>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <footer class="footer-note">
+      Always verify your photo using UPSC's official guidelines or official UPSC tools before upload.
+    </footer>
+  </main>
+  <script type="module" src="./src/app.js"></script>
+</body>
+</html>
